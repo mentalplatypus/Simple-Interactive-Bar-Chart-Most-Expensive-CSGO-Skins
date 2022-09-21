@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - [4] Interactive Bar Chart (code from textbook)</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!--Scale is kind of weird because of the dimensions of width and height-->
+  <head>
+		<meta charset="utf-8">
+    <h1 style="font-family: cambria, sans-serif">Top 20 Most Expensive CS:GO Skins Sold (in Hundreds USD)</h1>
+		<script type="text/javascript" src="../d3.js"></script>
+    
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+		<style type="text/css">
+			rect:hover {
+				fill: #e8b827;
+			}
+			#tooltip {
+				position: absolute;
+				width: 200px;
+				height: auto;
+				padding: 10px;
+				background-color: white;
+				-webkit-border-radius: 10px;
+				-moz-border-radius: 10px;
+				border-radius: 10px;
+				-webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+				-moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+				box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+				pointer-events: none;
+			}
+			#tooltip.hidden {
+				display: none;
+			}
+			#tooltip p {
+				margin: 0;
+				font-family: "cambria", sans-serif;
+				font-size: 12px;
+				line-height: 20px;
+			}
+
+		</style>
+	</head>
+	<body>
+		<div id="tooltip" class="hidden">
+			<p><span id="skin"></span></p>
+			<p><span id="value"></span></p>
+		</div>
+		<script type="text/javascript">
+
+			//Width and height
+			var w = 900;
+			var h = 600;
+			
+var dataset = [[52.5957,"StatTrak™ M9 Bayonet (Doppler; Sapphire), Factory New (0.010399505)"],[52.8750,"Talon Knife (Doppler; Sapphire), Minimal Wear (N/A)"],[53.3570,"StatTrak™ Karambit (Doppler; Sapphire), Minimal Wear (N/A)"],[56.9532,"StatTrak™ Talon Knife (Doppler; Sapphire), Minimal Wear (N/A)"],[57.0836,"StatTrak™ Karambit (Doppler; Sapphire), Factory New (0.018374531)"],[57.3425,"M9 Bayonet (Doppler; Sapphire), Factory New (0.004930601)"],[58.6631,"Butterfly Knife (Doppler; Sapphire), Minimal Wear (0.078564681)"],[59.4225,"StatTrak™ Butterfly Knife (Doppler; Sapphire), Minimal Wear (0.073029414)"],[59.5484,"Karambit (Gamma Doppler; Emerald), Factory New (0.001643619)"],[61.0191,"M9 Bayonet (Crimson Web), Factory New (0.061083805)"],[62.8189,"M9 Bayonet (Gamma Doppler; Emerald), Factory New (0.006457902)"],[63.6800,"StatTrak™ Bowie Knife (Crimson Web), Factory New (0.062116709)"],[67.4582,"StatTrak™ M9 Bayonet (Gamma Doppler; Emerald), Factory New (0.015450926)"],[73.0191,"StatTrak™ Karambit (Gamma Doppler; Emerald), Factory New (0.016669875)"],[79.8305,"StatTrak™ Butterfly Knife (Doppler; Sapphire), Factory New (0.010998931)"],[85.0000,"Sport Gloves (Pandora’s Box), Factory New (0.069647297)"],[90.0450,"Sport Gloves (Vice), Factory New (N/A)"],[116.6450,"StatTrak™ Karambit (Crimson Web), Factory New (0.068608969)"],[148.5240,"StatTrak™ M9 Bayonet (Crimson Web), Factory New (N/A)"],[196.3280,"Souvenir AWP (Dragon Lore), Factory New (0.060780853)"]];
+
+			var xScale = d3.scaleBand()
+							.domain(d3.range(dataset.length))
+							.rangeRound([0, w])
+							.paddingInner(0.15);
+
+			var yScale = d3.scaleLinear()
+							.domain([0, d3.max(dataset)])
+							.range([0, h]);
+			
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+
+			svg.selectAll("rect")
+			   .data(dataset)
+			   .enter()
+			   .append("rect")
+			   .attr("x", function(d, i) {
+			   		return xScale(i);
+			   })
+			   .attr("y", function(d) {
+			   		return h - (d[0]*3);
+			   })
+			   .attr("width", xScale.bandwidth())
+			   .attr("height", function(d) {
+			   		return d[0]*3;
+			   })
+			   .attr("fill", function(d) {
+					return "#691e56";
+			   })
+         .attr("opacity",function(d){
+        return d[0]/100;
+      })
+			   .on("mouseover", function(d) {
+
+					var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.bandwidth() / 2;
+					var yPosition = parseFloat(d3.select(this).attr("y")) / 2 + h / 2;
+
+					d3.select("#tooltip")
+						.style("left", xPosition + "px")
+						.style("top", yPosition + "px")						
+						.select("#skin")
+						.text(d[1]);
+        d3.select("#tooltip")
+											
+						.select("#value")
+						.text(d[0]);
+			   
+					d3.select("#tooltip").classed("hidden", false);
+
+			   })
+			   .on("mouseout", function() {
+
+					d3.select("#tooltip").classed("hidden", true);
+					
+			   })
+			   .on("click", function() {
+			   		sortBars();
+			   });
+
+			var sortOrder = false;
+
+			var sortBars = function() {
+
+			   	sortOrder = !sortOrder;
+
+				svg.selectAll("rect")
+				   .sort(function(a, b) {
+				   		if (sortOrder) {
+					   		return d3.ascending(a, b);
+				   		} else {
+					   		return d3.descending(a, b);
+				   		}
+				   	})
+				   .transition()
+				   .delay(function(d, i) {
+					   return i * 100;
+				   })
+				   .duration(1000)
+				   .attr("x", function(d, i) {
+				   		return xScale(i);
+				   });
+
+			};			
+			
+		</script>
+	</body>
+<!-- partial -->
+  
+</body>
+</html>
