@@ -1,4 +1,9 @@
-# [4] Interactive Bar Chart (code from textbook)
+# Most Expensive CS:GO Skins
 
-A Pen created on CodePen.io. Original URL: [https://codepen.io/mentalplatypus/pen/WNRJBmg](https://codepen.io/mentalplatypus/pen/WNRJBmg).
+**Live:** https://mentalplatypus.github.io/Simple-Interactive-Bar-Chart-Most-Expensive-CSGO-Skins/
 
+An interactive D3 bar chart of the most expensive CS:GO weapon skins.
+
+Also on CodePen: https://codepen.io/mentalplatypus/pen/WNRJBmg
+
+Part of [David Wang's portfolio](https://mentalplatypus.github.io/).
